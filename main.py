@@ -6,11 +6,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import nltk
 nltk.download('punkt')
+
+# Implementation of Naive Bayes from Scratch in Python
 
 # defining data processing function
 def preprocess_string(text):
@@ -182,8 +184,8 @@ if __name__ == '__main__':
     # fit and train the data
     nb.train(X_train, y_train)
 
-    no_classes = nb.test(X_test)
-    test_accuracy = calc_accuracy(y_test, no_classes)
+    predictions = nb.test(X_test)
+    test_accuracy = calc_accuracy(y_test, predictions)
 
     print("Naive Bayes accuracy: ", test_accuracy)
 
@@ -212,6 +214,32 @@ if __name__ == '__main__':
     plt.xlabel("Size of Dataset")
     plt.ylim((0.9, 1))
     plt.gcf().subplots_adjust(bottom=0.15)
+    plt.show()
+
+    fprs, tprs, thresholds = roc_curve(y_test, predictions)
+
+    # compute the AUC for NB
+    print('AUC for NB:', auc(fprs, tprs))
+
+    plt.plot(fprs, tprs, marker='.', label='ROC curve (area = %0.3f)' % round(auc(fprs, tprs), 3))
+
+    plt.plot([0, 1], [0, 1], linestyle='--', color='grey', label='Random')
+
+    start, end = plt.xlim()
+
+    plt.xticks(np.round(np.arange(start, end, 0.1), 2))
+
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+
+    plt.title("Figure4. ROC curve for Naive Bayes", size=10)
+
+    plt.xlabel('False Positive Rate', size=10)
+
+    plt.ylabel('True Positive Rate', size=10)
+
+    plt.legend()
+
     plt.show()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
